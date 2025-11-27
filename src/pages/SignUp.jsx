@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const signUp = useAuth();
+  const {signUp} = useAuth();
   const [formData, setFormData] = useState({
     fullname: "",
     username: "",
@@ -31,9 +31,9 @@ export default function Signup() {
     e.preventDefault();
     setErrorMsg("");
     setLoading(true);
+    console.log("hello");
 
     try {
-      // ✅ THE FIX — This FormData MUST be declared here
       const fd = new FormData();
 
       fd.append("fullname", formData.fullname);
@@ -47,7 +47,6 @@ export default function Signup() {
       }
 
       const { data } = await signUp(fd);
-
 
       navigate("/login");
     } catch (error) {

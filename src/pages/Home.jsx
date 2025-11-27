@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useVideos } from "../context/VideoContext";
 import { usePlaylists } from "../context/PlaylistContext";
 import { Ellipsis, ListPlus, Pencil, Trash2 } from "lucide-react";
-import { Grid, ThreeDotMenu } from "../ui";
+import { Grid, HoverVideo, ThreeDotMenu } from "../ui";
 
 export default function Home() {
   const { videos, loading, error } = useVideos();
   const { playlists, addVideoToPlaylist } = usePlaylists();
-console.log(error);
 
   // Local state
   const [selectedVideoId, setSelectedVideoId] = useState(null);
@@ -27,10 +26,14 @@ console.log(error);
     setShowPlaylistModal(false);
   };
 
+
   if (loading) return <p>Loading...</p>;
-  if (error) return ( <div className="flex bg-black min-h-screen justify-center items-center"> 
-    <p className="text-white text-2xl">opps..! {error}</p>
-    </div>);
+  if (error)
+    return (
+      <div className="flex bg-black min-h-screen justify-center items-center">
+        <p className="text-white text-2xl">opps..! {error}</p>
+      </div>
+    );
 
   return (
     <>
@@ -38,14 +41,9 @@ console.log(error);
         {videos.map((video) => (
           <div
             key={video._id}
-            className="bg-white border rounded-xl shadow p-3"
+            className="bg-white w-full hover:scale-105 transition duration-500 ease-in-out  border rounded-xl hover:shadow-amber-200 hover:shadow-xl  p-3"
           >
-            <video
-              className="rounded-lg w-full h-40 object-cover"
-              src={video.videoFile}
-              poster={video.thumbnail}
-              controls
-            />
+            <HoverVideo key={video._id} video={video} />
 
             <h2 className="text-lg font-semibold mt-2">{video.title}</h2>
 
@@ -76,7 +74,7 @@ console.log(error);
       </Grid>
 
       {showPlaylistModal && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
+        <div className="fixed inset-0 bg-black/40  flex justify-center items-center">
           <div className="bg-white p-4 rounded-lg w-80">
             <h3 className="text-lg font-semibold mb-3">Select Playlist</h3>
 

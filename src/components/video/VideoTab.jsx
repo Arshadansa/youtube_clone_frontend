@@ -1,26 +1,52 @@
 "use client";
 import { useVideos } from "../../context/VideoContext";
 import { Pencil, Trash2 } from "lucide-react";
-import { ConfirmNotify, Modal, TableLayout, UpdateVideoForm } from "../../ui";
-import { useState } from "react";
+import {
+  ConfirmNotify,
+  Modal,
+  TableLayout,
+  UpdateVideo,
+  VideoUploadForm,
+} from "../../ui";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function VideoTab() {
-  const { videos, loading, error, deleteVideo, editVideo } = useVideos();
+  const { getUserVideos, setUserVideo, loading, deleteVideo, userVideo } =
+    useVideos();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const { user } = useAuth();
 
-  const openEditModal = async (video) => {
+  const userID = user.data._id;
+
+  // Open edit modal
+  const openEditModal = (video) => {
     setSelectedVideo(video);
-    setIsModalOpen(true);
-    console.log("Edit:", video);
+    setIsEditModalOpen(true);
+  };
+
+  // Open upload modal
+  const openUploadModal = () => {
+    setIsUploadModalOpen(true);
   };
 
   const handleDelete = async (id) => {
     const confirmed = await ConfirmNotify();
     if (!confirmed) return;
-    await deleteVideo(id);
+    try {
+      await deleteVideo(id);
+      setUserVideo(prev => prev.filter(video => video._id !== id));
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    getUserVideos(userID);
+  }, [userID]);
 
   if (loading) return <p>Loading videos...</p>;
 
@@ -36,14 +62,30 @@ export default function VideoTab() {
 
   return (
     <>
+      {/* Upload Modal */}
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        title="Upload Video"
+      >
+        <VideoUploadForm
+          onSubmit={(formData) => {
+            setIsUploadModalOpen(false);
+          }}
+        />
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
         title="Update Video"
       >
-        <UpdateVideoForm
+        <UpdateVideo
           video={selectedVideo}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsEditModalOpen(false);
+          }}
         />
       </Modal>
 
@@ -56,40 +98,28 @@ export default function VideoTab() {
           </>
         }
       >
-        {videos?.map((video) => (
+        {userVideo?.map((video) => (
           <tr
             key={video._id}
             className="hover:bg-gray-800 text-center transition"
           >
-            {/* Thumbnail */}
             <td className="py-2.5 px-4 border-b">
               <video
                 src={video.videoFile}
                 poster={video.thumbnail}
+                controls
                 className="w-24 h-16 rounded object-cover bg-black"
               />
             </td>
-
-            {/* Title */}
             <td className="py-2.5 px-4 border-b capitalize">
               {video.title || "Untitled"}
             </td>
-
-            {/* Comments */}
-            <td className="py-2.5 px-4 border-b">{video.commentsCount}</td>
-
-            {/* Likes */}
-            <td className="py-2.5 px-4 border-b">{video.likesCount}</td>
-
-            {/* Views */}
-            <td className="py-2.5 px-4 border-b">{video.views}</td>
-
-            {/* Upload Date */}
+            <td className="py-2.5 px-4 border-b">{video.commentsCount || 0}</td>
+            <td className="py-2.5 px-4 border-b">{video.likesCount || 0}</td>
+            <td className="py-2.5 px-4 border-b">{video.views || 0}</td>
             <td className="py-2.5 px-4 border-b">
               {new Date(video.createdAt).toLocaleDateString()}
             </td>
-
-            {/* Action Buttons */}
             <td className="py-2.5 px-4 border-b">
               <div className="flex items-center justify-center gap-3">
                 <button

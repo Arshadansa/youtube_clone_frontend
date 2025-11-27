@@ -32,7 +32,7 @@ export default function ThreeDotMenu({ trigger, children }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute cursor-pointer right-0 mt-2 w-44 bg-white rounded-xl shadow-xl z-40 overflow-hidden"
+            className="absolute  cursor-pointer right-0 mt-2 w-44 bg-white rounded-xl shadow-xl z-40 overflow-hidden"
           >
             {children}
           </motion.div>

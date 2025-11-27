@@ -12,12 +12,10 @@ export default function EditPlaylistForm({ playlist, onClose }) {
   const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     await updatePlaylist(playlist._id, {
       name,
       description,
     });
-
     setLoading(false);
     onClose();
   };

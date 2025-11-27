@@ -4,9 +4,20 @@ import { usePlaylists } from "../../context/PlaylistContext";
 import { Modal, EditPlaylistForm, TableLayout } from "../../ui";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useEffect } from "react";
 
 export default function PlaylistTab({ view }) {
-  const { playlists, loading, error, deletePlaylist } = usePlaylists();
+  const { playlists, loading, error, deletePlaylist, getMyPlaylist } =
+    usePlaylists();
+  const { user } = useAuth();
+
+  const userID = user.data._id;
+
+  useEffect(() => {
+    getMyPlaylist(userID);
+  }, [userID]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
@@ -33,7 +44,6 @@ export default function PlaylistTab({ view }) {
   };
 
   if (loading) return <p>Loading playlists...</p>;
-  if (error) return <p>{error}</p>;
 
   if (view === "grid") {
     return (
@@ -48,62 +58,71 @@ export default function PlaylistTab({ view }) {
             onClose={() => setIsModalOpen(false)}
           />
         </Modal>
+        {error ? (
+          <div className="w-full ">
+            <span className="text-white">{error}</span>
+          </div>
+        ) : (
+          <>
+            {list.map((playlist) => {
+              const firstVideo = playlist?.videos || [];
+              const thumbnail =
+                firstVideo[0]?.thumbnail ||
+                firstVideo[0]?.videoFile ||
+                "https://via.placeholder.com/300x180?text=No+Image";
 
-        {list.map((playlist) => {
-          const firstVideo = playlist?.videos || [];
-          const thumbnail =
-            firstVideo[0]?.thumbnail ||
-            firstVideo[0]?.videoFile ||
-            "https://via.placeholder.com/300x180?text=No+Image";
+              return (
+                <div
+                  key={playlist._id}
+                  className="bg-white/10  border border-gray-700 p-3 rounded-xl shadow  hover:bg-white/20 transition"
+                >
+                  {/* Thumbnail */}
+                  <img
+                    onClick={() => handlePlaylistCard(playlist._id)}
+                    src={thumbnail}
+                    alt={playlist.name}
+                    className="w-full h-40 cursor-pointer object-center rounded-lg"
+                  />
 
-          return (
-            <div
-              key={playlist._id}
-              className="bg-white/10  border border-gray-700 p-3 rounded-xl shadow  hover:bg-white/20 transition"
-            >
-              {/* Thumbnail */}
-              <img
-                onClick={() => handlePlaylistCard(playlist._id)}
-                src={thumbnail}
-                alt={playlist.name}
-                className="w-full h-40 cursor-pointer object-center rounded-lg"
-              />
+                  {/* Title */}
+                  <h2 className="text-xl font-semibold mt-3">
+                    {playlist.name}
+                  </h2>
 
-              {/* Title */}
-              <h2 className="text-xl font-semibold mt-3">{playlist.name}</h2>
+                  {/* Description */}
+                  <p className="text-gray-300 text-sm mt-2">
+                    {playlist.description || "No description"}
+                  </p>
 
-              {/* Description */}
-              <p className="text-gray-300 text-sm mt-2">
-                {playlist.description || "No description"}
-              </p>
+                  {/* Footer */}
+                  <div className="flex justify-between items-center mt-4">
+                    <span className="text-gray-400 text-sm">
+                      {playlist.totalVideos} videos
+                    </span>
 
-              {/* Footer */}
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-gray-400 text-sm">
-                  {playlist.totalVideos} videos
-                </span>
+                    <div className="flex gap-2">
+                      <button className="p-2 bg-white/80 rounded-full hover:bg-white transition">
+                        <Pencil
+                          onClick={() => openEditModal(playlist)}
+                          size={16}
+                          className="text-gray-700"
+                        />
+                      </button>
 
-                <div className="flex gap-2">
-                  <button className="p-2 bg-white/80 rounded-full hover:bg-white transition">
-                    <Pencil
-                      onClick={() => openEditModal(playlist)}
-                      size={16}
-                      className="text-gray-700"
-                    />
-                  </button>
-
-                  <button className="p-2 bg-white/80 rounded-full hover:bg-red-200 transition">
-                    <Trash2
-                      onClick={() => handleDelete(playlist._id)}
-                      size={16}
-                      className="text-red-600"
-                    />
-                  </button>
+                      <button className="p-2 bg-white/80 rounded-full hover:bg-red-200 transition">
+                        <Trash2
+                          onClick={() => handleDelete(playlist._id)}
+                          size={16}
+                          className="text-red-600"
+                        />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </>
+        )}
       </>
     );
   }
@@ -129,15 +148,7 @@ export default function PlaylistTab({ view }) {
         />
       </Modal>
 
-      <TableLayout
-        columns={columns}
-        fallback={
-          <>
-            <p>No playlist uploaded yet.</p>
-            <p>This page has yet to upload a playlist.</p>
-          </>
-        }
-      >
+      <TableLayout columns={columns} err={error}>
         {list.map((p) => {
           const thumb =
             p.videos?.[0]?.thumbnail ||

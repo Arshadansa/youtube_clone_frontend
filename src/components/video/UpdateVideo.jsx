@@ -2,7 +2,7 @@ import React from "react";
 import { useVideos } from "../../context/VideoContext";
 import { useForm } from "react-hook-form";
 
-function UpdateVideoForm({ video, onClose }) {
+function UpdateVideo({ video, onClose }) {
   const { register } = useForm();
 
   const [name, setName] = React.useState(video?.title || "");
@@ -12,7 +12,6 @@ function UpdateVideoForm({ video, onClose }) {
   const [thumbnail, setThumbnail] = React.useState();
   const [loading, setLoading] = React.useState(false);
 
-  console.log(name, description);
 
   const { editVideo, error } = useVideos();
 
@@ -35,7 +34,7 @@ function UpdateVideoForm({ video, onClose }) {
   return (
     <form onSubmit={handleSave} className="space-y-4 p-4">
       <div>
-        <label className="block text-sm mb-1 text-white">Playlist Name</label>
+        <label className="block text-sm mb-1 text-black">Playlist  Name</label>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -44,7 +43,7 @@ function UpdateVideoForm({ video, onClose }) {
       </div>
 
       <div>
-        <label className="block text-sm mb-1 text-white">Description</label>
+        <label className="block text-sm mb-1 text-black">Description</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -71,7 +70,7 @@ function UpdateVideoForm({ video, onClose }) {
             alt="Thumbnail Preview"
             className="w-32 h-20 object-cover rounded mt-2"
           />
-        ) : video.thumbnail ? (
+        ) : video?.thumbnail ? (
           <img
             src={video.thumbnail}
             alt="Thumbnail Preview"
@@ -95,4 +94,4 @@ function UpdateVideoForm({ video, onClose }) {
   );
 }
 
-export default UpdateVideoForm;
+export default UpdateVideo;

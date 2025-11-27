@@ -1,7 +1,6 @@
 import { apiGet, apiPost, apiDelete, apiPatch } from "./http";
 
-export const getMyPlaylist = () =>
-  apiGet("/playList/user/690f0b3fd386a34c179a680b");
+export const getMyPlaylist = (id) => apiGet(`/playList/user/${id}`);
 
 export const getSinglePlaylist = (id) => apiGet(`/playList/${id}`);
 

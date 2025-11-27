@@ -3,7 +3,7 @@ import { PlaylistCard, Grid, PlaylistTab } from "../ui";
 
 function Playlist() {
   return (
-    <div className="bg-black p-3 w-full min-h-screen">
+    <div className=" p-3  w-full ">
       <h1 className="text-3xl font-bold text-white">Playlists</h1>
       <Grid>
         <PlaylistTab view="grid" />

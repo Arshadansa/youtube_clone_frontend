@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
-  getMyPlaylist,
+  getMyPlaylist as getMyPlaylistApi,
   updatePlaylist as updatePlaylistApi,
   deletePlaylist as deletePlaylistApi,
   addVideoToPlaylist as addVideoToPlaylistApi,
@@ -9,6 +9,7 @@ import {
 } from "../services/playlistApi";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
+import { ConfirmNotify } from "../ui";
 
 const PlaylistContext = createContext();
 
@@ -21,26 +22,27 @@ export default function PlaylistProvider({ children }) {
   const [singlePlaylist, setSinglePlaylist] = useState(null);
   const [currentVideo, setCurrentVideo] = useState(null);
 
-  const fetchPlaylists = async () => {
-    if (authLoading) return;
-    if (!user) return;
-
+  const getMyPlaylist = async (id) => {
     try {
+      if (authLoading) return;
+      if (!user) return;
       setLoading(true);
-      const response = await getMyPlaylist();
+      const response = await getMyPlaylistApi(id);
       setPlaylists(response?.data || []);
       setError(null);
     } catch (err) {
-      setError("Failed to fetch playlists");
-      console.error("PlaylistContext Fetch Error:", err);
+     if (err.response?.data) {
+      setError(err.response.data.message);
+      setPlaylists([]); 
+    } else {
+      setError(err.message || "Something went wrong");
+    }
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchPlaylists();
-  }, [user]);
+
 
   const getSinglePlaylist = async (playlistId) => {
     try {
@@ -52,19 +54,13 @@ export default function PlaylistProvider({ children }) {
       if (response.data?.videos?.length > 0) {
         setCurrentVideo(response.data.videos[0]);
       }
+
       setError(null);
     } catch (err) {
       setError("Failed to fetch playlist");
     } finally {
       setLoading(false);
     }
-  };
-
-  // Update locally
-  const updatePlaylistLocally = (id, updatedData) => {
-    setPlaylists((prev) =>
-      prev.map((pl) => (pl._id === id ? { ...pl, ...updatedData } : pl))
-    );
   };
 
   // Delete locally
@@ -76,16 +72,25 @@ export default function PlaylistProvider({ children }) {
   const updatePlaylist = async (id, data) => {
     try {
       const response = await updatePlaylistApi(id, data);
-
       const updated = response.data.data;
-
       updatePlaylistLocally(id, updated);
-      fetchPlaylists();
+      toast.success("playlist updated Successfully");
+      getMyPlaylistApi();
       return updated;
     } catch (err) {
       console.error("Update playlist error:", err);
       throw err;
     }
+  };
+  // Update locally
+  const updatePlaylistLocally = (id, updatedData) => {
+    setPlaylists((prev) =>
+      prev.map((pl) => (pl._id === id ? { ...pl, ...updatedData } : pl))
+    );
+
+    setSinglePlaylist((prev) =>
+      prev && prev._id === id ? { ...prev, ...updatedData } : prev
+    );
   };
 
   // Delete playlist (API + local)
@@ -105,7 +110,7 @@ export default function PlaylistProvider({ children }) {
     try {
       const response = await addVideoToPlaylistApi(videoId, playlistId);
       addVideoToPlaylistLocally(playlistId, videoId);
-      fetchPlaylists();
+      getMyPlaylistApi();
       toast.success("Video added to playlist!");
       return response.data;
     } catch (err) {
@@ -126,6 +131,8 @@ export default function PlaylistProvider({ children }) {
   // remove video from playlist (API + local update)
   const removeVideoFromPlaylist = async (videoId, playlistId) => {
     try {
+      const confirmed = await ConfirmNotify();
+      if (!confirmed) return;
       await removeVideoFromPlaylistApi(videoId, playlistId);
 
       removeVideoFromPlaylistLocally(videoId, playlistId);
@@ -161,9 +168,10 @@ export default function PlaylistProvider({ children }) {
         currentVideo,
         singlePlaylist,
         setCurrentVideo,
+       getMyPlaylist,
         loading,
         error,
-        refreshPlaylists: fetchPlaylists,
+        refreshPlaylists: getMyPlaylistApi,
         updatePlaylist,
         updatePlaylistLocally,
         deletePlaylist,

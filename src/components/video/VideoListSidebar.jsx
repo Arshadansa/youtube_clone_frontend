@@ -1,18 +1,24 @@
-import { usePlaylists } from "../../context/PlaylistContext";
 import { EllipsisVertical, ListX, Pencil } from "lucide-react";
-import { EditPlaylistForm, Modal, ThreeDotMenu } from "../../ui";
+import { Modal, ThreeDotMenu, ConfirmNotify, UpdateVideo } from "../../ui";
 import { useState } from "react";
+import { useVideos } from "../../context/VideoContext";
 
-export default function PlaylistSidebar({ title, list, activeVideo }) {
-  const { removeVideoFromPlaylist, setCurrentVideo } = usePlaylists();
+export default function VideoListSidebar({ list }) {
+  const { setCurrentVideo, currentVideo, deleteVideo } = useVideos();
 
   const [hover, setHover] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   const openEditModal = (list) => {
-    setSelectedPlaylist(list);
+    setSelectedVideo(list);
     setIsModalOpen(true);
+  };
+  const handleDelete = async (id) => {
+    const confirmed = await ConfirmNotify();
+    if (!confirmed) return;
+
+    await deleteVideo(id);
   };
 
   return (
@@ -20,27 +26,29 @@ export default function PlaylistSidebar({ title, list, activeVideo }) {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Edit Playlist"
+        title="Update Video"
       >
-        <EditPlaylistForm
-          playlist={selectedPlaylist}
+        <UpdateVideo
+          video={selectedVideo}
           onClose={() => setIsModalOpen(false)}
         />
       </Modal>
-      <h2 className="text-xl text-white font-semibold mb-3">{title}</h2>
-      <div className="flex  border border-[#333333] shadow-md rounded-md min-h-[500px] overflow-y-scroll flex-col gap-3">
-        {list?.videos?.map((video, index) => (
+
+      <h2 className="text-xl text-white font-semibold mb-3">{""}</h2>
+
+      <div className="flex border  border-[#333333] shadow-md rounded-md min-h-[450px] overflow-y-scroll flex-col gap-3">
+        {list?.map((video, index) => (
           <div
             key={video._id}
-            className={`flex justify-between items-center gap-3 p-2 rounded-lg cursor-pointer
-              ${
-                list?._id === video._id ? "bg-white/20" : "hover:bg-gray-500/30"
-              }`}
+            className={`flex justify-between items-center p-2 rounded-lg cursor-pointer 
+    ${
+      currentVideo?._id === video._id ? "bg-white/20" : "hover:bg-gray-500/30"
+    }`}
             onMouseEnter={() => setHover(video._id)}
             onMouseLeave={() => setHover(null)}
             onClick={() => setCurrentVideo(video)}
           >
-            <div className="flex  text-white gap-3">
+            <div className="flex text-white gap-3">
               <img src={video.thumbnail} className="w-32 h-16 rounded" />
               <div>
                 <p className="font-semibold text-sm line-clamp-2">
@@ -57,14 +65,14 @@ export default function PlaylistSidebar({ title, list, activeVideo }) {
                 }
               >
                 <button
-                  onClick={() => openEditModal(list)}
+                  onClick={() => openEditModal(video)}
                   className=" py-2 px-4 cursor-pointer w-full hover:bg-gray-100 flex items-center gap-2"
                 >
                   <Pencil size={16} /> Edit
                 </button>
 
                 <button
-                  onClick={() => removeVideoFromPlaylist(video._id, list._id)}
+                  onClick={() => handleDelete(video._id)}
                   className=" px-4  py-2 w-full cursor-pointer hover:bg-red-100 text-red-600 flex items-center gap-2"
                 >
                   <ListX size={16} /> Delete

@@ -49,7 +49,7 @@ export default function YourVideo() {
   }
   const [tab, setTab] = useState("Videos");
   return (
-    <div className=" min-h-screen bg-white dark:bg-black">
+    <div className="">
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-zinc-800">
         <nav className="flex items-center  justify-between mx-8 ">

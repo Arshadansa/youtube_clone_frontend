@@ -1,11 +1,14 @@
 "use client";
 
-export default function TableLayout({ columns = [], children, fallback }) {
+export default function TableLayout({ columns = [], children, err }) {
   const hasRows = Array.isArray(children) && children.length > 0;
+console.log(err);
 
   return (
     <div className="w-full overflow-x-auto">
-      {hasRows ? (
+      {err ? (
+        <div className="text-center mt-10 text-red-500">{err}</div>
+      ) : hasRows ? (
         <table className="min-w-full text-white backdrop-blur-md">
           <thead>
             <tr>
@@ -22,9 +25,7 @@ export default function TableLayout({ columns = [], children, fallback }) {
 
           <tbody>{children}</tbody>
         </table>
-      ) : (
-        <div className="text-center mt-10">{fallback}</div>
-      )}
+      ) : null}
     </div>
   );
 }

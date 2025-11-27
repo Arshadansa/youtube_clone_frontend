@@ -3,9 +3,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { usePlaylists } from "../../context/PlaylistContext";
-import { SingleVideoLayout } from "../../ui";
-import VideoPlayer from "./VideoPlayer";
-import PlaylistSidebar from "./PlaylistSidebar";
+import { SingleVideoLayout, VideoPlayer, PlaylistSidebar } from "../../ui";
 
 export default function PlaylistCard() {
   const { id } = useParams();
@@ -15,7 +13,6 @@ export default function PlaylistCard() {
   useEffect(() => {
     getSinglePlaylist(id);
   }, [id]);
-  console.log(singlePlaylist, "current video in playlist card");
 
   if (loading || !singlePlaylist) return <p>Loading...</p>;
 
@@ -24,7 +21,13 @@ export default function PlaylistCard() {
       left={
         <VideoPlayer video={currentVideo} playlistName={singlePlaylist.name} />
       }
-      right={<PlaylistSidebar />}
+      right={
+        <PlaylistSidebar
+          title="Playlist Videos"
+          list={singlePlaylist}
+          activeVideo={currentVideo}
+        />
+      }
     />
   );
 }

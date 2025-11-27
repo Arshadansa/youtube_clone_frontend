@@ -1,6 +1,11 @@
 "use client";
 
-export default function TweetsTab({ tweets = [], loading, error, onUploadClick }) {
+export default function TweetsTab({
+  tweets = [],
+  loading,
+  error,
+  onUploadClick,
+}) {
   if (loading) return <p>Loading tweets...</p>;
   if (error) return <p>{error}</p>;
 
@@ -14,13 +19,6 @@ export default function TweetsTab({ tweets = [], loading, error, onUploadClick }
           <p>This page has yet to upload tweet data.</p>
         </div>
       )}
-
-      <button
-        onClick={onUploadClick}
-        className="mt-6 text-xl bg-amber-300 px-4 py-2 rounded"
-      >
-        + New Tweet
-      </button>
     </div>
   );
 }

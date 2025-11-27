@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useVideos } from "../../context/VideoContext";
 
 const VideoUploadForm = ({ onSubmit }) => {
   const {
@@ -8,23 +9,32 @@ const VideoUploadForm = ({ onSubmit }) => {
     formState: { errors, isSubmitting },
     reset,
   } = useForm();
+  const { setUserVideo } = useVideos();
 
   const submitHandler = async (data) => {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-    formData.append("thumbnail", data.thumbnail[0]);
-    formData.append("videoFile", data.videoFile[0]);
+  const formData = new FormData();
+  formData.append("title", data.title);
+  formData.append("description", data.description);
+  formData.append("thumbnail", data.thumbnail[0]);
+  formData.append("videoFile", data.videoFile[0]);
 
-    try {
-      await onSubmit(formData);
-      reset();
-      alert("Video uploaded successfully!");
-    } catch (error) {
-      console.error(error);
-      alert("Error uploading video");
-    }
-  };
+  try {
+    const res = await onSubmit(formData);
+
+    // MUST use res.data.data because backend returns { data: {...video} }
+    const newVideo = res.data.data;
+
+    // update UI instantly (no refresh needed)
+    setUserVideo((prev) => [newVideo, ...prev]);
+
+    reset();
+    alert("Video uploaded successfully!");
+  } catch (error) {
+    console.error("UPLOAD ERROR:", error);
+    alert("Error uploading video");
+  }
+};
+
 
   return (
     <form
@@ -78,12 +88,12 @@ const VideoUploadForm = ({ onSubmit }) => {
       </div>
 
       <div>
-        <label className="block mb-1 font-medium">Video File</label>
+        <label className="block mb-1 text-black font-medium">Video File</label>
         <input
           type="file"
           accept="video/*"
           {...register("videoFile", { required: "Video file is required" })}
-          className="w-full"
+          className="w-full placeholder:file"
         />
         {errors.videoFile && (
           <p className="text-red-500 text-sm mt-1">

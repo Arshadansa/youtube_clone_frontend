@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainLayout from "./ui/mainLayout";
-import { YourVideo, Home, Login, Signup, Playlist, PlaylistCard } from "./ui";
+import { YourVideo, Home, Login, Signup, Playlist, PlaylistCard, VideoCard } from "./ui";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import PublicRoute from "./components/Auth/PublicRoute";
 import { ToastContainer } from "react-toastify";
@@ -18,6 +18,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/watch/:id"
+            element={
+              <ProtectedRoute>
+                <VideoCard />
               </ProtectedRoute>
             }
           />
