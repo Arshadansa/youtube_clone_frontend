@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainLayout from "./ui/MainLayout";
+import MainLayout from "../src/ui/MainLayout";
 import { YourVideo, Home, Login, Signup, Playlist, PlaylistCard, VideoCard } from "./ui";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import PublicRoute from "./components/Auth/PublicRoute";
