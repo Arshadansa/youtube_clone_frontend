@@ -1,4 +1,4 @@
-import Footer from "../components/layout/Footer/Footer";
+import Footer from "../components/Layout/footer/Footer";
 import About from "../pages/About";
 import Login from "../pages/Login";
 import NotFound from "../pages/NotFound";
