@@ -6,6 +6,8 @@ import { usePlaylists } from "../../context/PlaylistContext";
 import { SingleVideoLayout, VideoPlayer, PlaylistSidebar } from "../../ui";
 
 export default function PlaylistCard() {
+  
+  
   const { id } = useParams();
   const { singlePlaylist, currentVideo, loading, getSinglePlaylist } =
     usePlaylists();

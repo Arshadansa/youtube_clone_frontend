@@ -27,8 +27,6 @@ export default function Login() {
     setLoading(true);
 
     try {
-    
-
       const response = await login(form);
 
       console.log("Login success:", response.data);
