@@ -25,13 +25,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (formData) => {
-    const res = await api.post("/users/login", formData);
+    const res = await api.post("users/login", formData);
     setUser(res.data);
     return res;
   };
 
   const signUp = async (data) => {
-    const res = await api.post("/users/register", data);
+    const res = await api.post("users/register", data);
     setUser(res.data);
     return res;
   };
