@@ -3,7 +3,7 @@ import About from "../pages/About";
 import Login from "../pages/Login";
 import NotFound from "../pages/NotFound";
 import Home from "../pages/Home";
-import Sidebar from "../components/Layout/sidebar/SideBar";
+import Sidebar from "../components/Layout/sidebar/Sidebar";
 import Navbar from "../components/Layout/header/Navbar";
 import Signup from "../pages/SignUp";
 import YourVideo from "../pages/Content";
