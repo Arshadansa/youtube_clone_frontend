@@ -6,7 +6,7 @@ export default function ThreeDotMenu({ trigger, children }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  // Close dropdown on outside click
+ 
   useEffect(() => {
     const handleClick = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
